@@ -1,6 +1,6 @@
+
 <template>
 <div class="project-search">
-  <h1>Search for a project: {{input}}</h1>
   <el-input
     placeholder="Project name"
     v-model="input"
@@ -9,15 +9,29 @@
     clearable>
   </el-input>
 
-  <div class="info" v-if="project">
-    Project: {{project.name}} ({{project.stargazers_count}}) Stars <br>
-    Project description: {{project.description}} <br>
-    <div class="author" v-if="authorWithMostCommits">
-      <img :src="authorWithMostCommits.author.avatar_url" alt=""> <br>
-      Author with most commits: {{authorWithMostCommits.author.login}} <br>
 
+  <div class="info" v-if="project">
+    <div class="project-info" v-if="project.name">
+      <b>Project: </b> <a :href="project.homepage" target="_blank">{{project.name}}</a> ({{project.stargazers_count}}) Stars <br>
+      <b>Project description:</b> {{project.description}} <br>
+      <b>Forks:</b> {{project.forks}} <br>
+      <b>Open issues:</b> {{project.open_issues_count}} <br>
+      <b>License:</b> {{project.license && project.license.name}}
+    </div>
+    <div class="author boxed" v-if="authorWithMostCommits && authorWithMostCommits.author">
+      <div class="is-flex">
+        <figure class="image is-128x128">
+          <img :src="authorWithMostCommits.author.avatar_url" :alt="authorWithMostCommits.author.login">
+        </figure>
+        Author with most commits: {{authorWithMostCommits.author.login}} <br>
+      </div>
+    </div>
+    <div class="project-qualities boxed" v-if="authorWithMostCommits && authorWithMostCommits.author && project.name">
+      <div class="has-license">
+        <b>Has license:</b> {{project.license && project.license.name ? 1 : 0}}
+      </div>
       <div class="bus-factor">
-        Bus factor: {{busFactor}} of 1: 1 being the best
+        <b>Bus factor:</b> {{busFactor}} of 1; 1 being the best
       </div>
     </div>
   </div>
@@ -30,10 +44,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 const GitHub = require('github-api')
 
 interface GHResult {
-  data: Object | Array<Object>
+  data: object | object[]
 }
 interface GHResultArray {
-  data: Array<any>
+  data: object[]
 }
 
 @Component
@@ -49,19 +63,22 @@ export default class ProjectSearch extends Vue {
     return this.projectContributorsStats.length > 0 ?
       this.projectContributorsStats[this.projectContributorsStats.length - 1]
       :
-      null
+      {total: 0}
   }
 
   get secondAuthorWithMostCommits () {
     return this.projectContributorsStats.length > 1 ?
       this.projectContributorsStats[this.projectContributorsStats.length - 2]
       :
-      null
+      {total: 0}
   }
 
   get busFactor () {
-    if (this.authorWithMostCommits && this.secondAuthorWithMostCommits) {
-      return (this.secondAuthorWithMostCommits.total / this.authorWithMostCommits.total).toFixed(2)
+    if (this.authorWithMostCommits
+      && this.secondAuthorWithMostCommits
+      && this.secondAuthorWithMostCommits.total
+      && this.secondAuthorWithMostCommits.total > 0) {
+        return (this.secondAuthorWithMostCommits.total / this.authorWithMostCommits.total).toFixed(2)
     } else {
       return 0 // only one
     }
@@ -82,4 +99,9 @@ export default class ProjectSearch extends Vue {
 </script>
 
 <style scoped lang="scss">
+.boxed {
+  border: 1px solid #afafaf;
+  border-radius: 2px;
+  padding: 5px;
+}
 </style>
