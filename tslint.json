@@ -18,6 +18,7 @@
     "semicolon": [
       true,
       "never"
-    ]
+    ],
+    "space-before-function-paren": true
   }
 }

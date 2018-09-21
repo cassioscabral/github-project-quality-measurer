@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "element-ui": "^2.4.5",
+    "github-api": "^3.0.0",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",

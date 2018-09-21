@@ -1,6 +1,9 @@
 <template>
   <div class="home">
-    <ProjectSearch msg="My Project Search"/>
+    <div class="comparator flex">
+      <ProjectSearch msg="Project A"/>
+      <ProjectSearch msg="Project B"/>
+    </div>
   </div>
 </template>
 
@@ -15,3 +18,13 @@ import ProjectSearch from '@/components/ProjectSearch.vue' // @ is an alias to /
 })
 export default class Home extends Vue {}
 </script>
+
+<style lang="scss" scoped>
+.flex {
+  display: flex;
+}
+
+.comparator {
+  justify-content: space-evenly;
+}
+</style>
