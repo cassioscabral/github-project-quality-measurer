@@ -40,6 +40,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { emit } from 'cluster';
 // import GitHub from 'github-api'
 const GitHub = require('github-api')
 
@@ -84,16 +85,14 @@ export default class ProjectSearch extends Vue {
     }
   }
 
-  public search () {
+  public async search () {
     const repo = this.gh.getRepo(this.input)
 
-    repo.getDetails().then((result: GHResult) => {
-      this.project = result.data
-    })
+    let repoDetailsResult = await repo.getDetails()
+    this.project = repoDetailsResult.data
 
-    repo.getContributorStats().then((result: any) => {
-      this.projectContributorsStats = result.data
-    })
+    let repoContributorStatsResult = await repo.getContributorStats()
+    this.projectContributorsStats = repoContributorStatsResult.data
   }
 }
 </script>

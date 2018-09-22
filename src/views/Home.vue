@@ -1,14 +1,14 @@
 <template>
   <div class="home">
     <div class="comparator flex">
-      <ProjectSearch msg="Project A"/>
-      <ProjectSearch msg="Project B"/>
+      <ProjectSearch @project-found="projectA = $event" msg="Project A"/>
+      <ProjectSearch @project-found="projectB = $event" msg="Project B"/>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import ProjectSearch from '@/components/ProjectSearch.vue' // @ is an alias to /src
 
 @Component({
@@ -16,7 +16,10 @@ import ProjectSearch from '@/components/ProjectSearch.vue' // @ is an alias to /
     ProjectSearch,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+   @Prop(Object) projectA: object
+   @Prop(Object) projectB: object
+}
 </script>
 
 <style lang="scss" scoped>
