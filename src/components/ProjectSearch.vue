@@ -26,14 +26,6 @@
         Author with most commits: {{authorWithMostCommits.author.login}} <br>
       </div>
     </div>
-    <div class="project-qualities boxed" v-if="authorWithMostCommits && authorWithMostCommits.author && project.name">
-      <div class="has-license">
-        <b>Has license:</b> {{project.license && project.license.name ? 1 : 0}}
-      </div>
-      <div class="bus-factor">
-        <b>Bus factor:</b> {{busFactor}} of 1; 1 being the best
-      </div>
-    </div>
   </div>
 </div>
 </template>
@@ -41,7 +33,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { emit } from 'cluster';
-// import GitHub from 'github-api'
 const GitHub = require('github-api')
 
 interface GHResult {
@@ -49,6 +40,10 @@ interface GHResult {
 }
 interface GHResultArray {
   data: object[]
+}
+
+interface Project {
+  license: object
 }
 
 @Component
@@ -81,26 +76,44 @@ export default class ProjectSearch extends Vue {
       && this.secondAuthorWithMostCommits.total > 0) {
         return (this.secondAuthorWithMostCommits.total / this.authorWithMostCommits.total).toFixed(2)
     } else {
-      return 0 // only one
+      return 0 // only one author
     }
   }
 
   public async search () {
     const repo = this.gh.getRepo(this.input)
 
-    let repoDetailsResult = await repo.getDetails()
+    const repoDetailsResult = await repo.getDetails()
     this.project = repoDetailsResult.data
 
-    let repoContributorStatsResult = await repo.getContributorStats()
+    const repoContributorStatsResult = await repo.getContributorStats()
     this.projectContributorsStats = repoContributorStatsResult.data
+
+    this.$emit('project-found', {
+      project: this.project,
+      projectContributorsStats: this.projectContributorsStats,
+      hasDocs: 0, // TODO need to verify first
+      hasLicense: repoDetailsResult.data.license && repoDetailsResult.data.license.name ? 1 : 0,
+      busFactor: this.busFactor,
+      activity: 0,
+    })
   }
 }
 </script>
 
 <style scoped lang="scss">
 .boxed {
-  border: 1px solid #afafaf;
-  border-radius: 2px;
+  border-top: 1px solid #afafaf;
   padding: 5px;
+}
+
+.project-search {
+  border: 1px solid #afafaf;
+  border-radius: 6px;
+
+  .project-info {
+    text-align: left;
+    padding-left: 5px;
+  }
 }
 </style>
