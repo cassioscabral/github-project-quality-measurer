@@ -20,7 +20,7 @@
           </tfoot>
           <tbody>
             <tr>
-              <th>1 - Has docs</th>
+              <th>1 - Has docs or Readme</th>
               <td>{{projectA ? projectA.hasDocs : 'Not found'}}</td>
               <td>{{projectB ? projectB.hasDocs : 'Not found'}}</td>
             </tr>

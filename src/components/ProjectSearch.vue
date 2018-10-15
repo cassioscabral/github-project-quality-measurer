@@ -50,6 +50,8 @@ interface Project {
 export default class ProjectSearch extends Vue {
   protected input = ''
   protected project = new Object()
+  protected repoReadme = new Object()
+  protected repoCommits = new Object()
   protected projectContributorsStats = []
   private gh = new GitHub()
 
@@ -80,22 +82,48 @@ export default class ProjectSearch extends Vue {
     }
   }
 
+  get commitScore () {
+    if (this.repoCommits) {
+      // all: is an array with 52 weeks of commits counts
+      let {all, owner} = this.repoCommits
+      console.log('all, owner', all, owner);
+      let sumOfZeroCommitWeeks = all.reduce((total, week) => {
+        week === 0 ? total += 1 : 0
+        return total
+      }, 0)
+
+      const totalOfWeeks = all.length // if a project has enough weeks(13 months) it will be 52
+      let score = 1 - sumOfZeroCommitWeeks / totalOfWeeks
+      return score > 0 ? score.toFixed(2) : 0
+    }
+  }
+
   public async search () {
     const repo = this.gh.getRepo(this.input)
-
+    console.log('repo', repo);
     const repoDetailsResult = await repo.getDetails()
     this.project = repoDetailsResult.data
-
+    console.log('this.project', this.project);
     const repoContributorStatsResult = await repo.getContributorStats()
     this.projectContributorsStats = repoContributorStatsResult.data
+    console.log('this.projectContributorsStats', this.projectContributorsStats);
+
+    const repoReadme = await repo.getReadme()
+    this.repoReadme = repoReadme.data;
+    console.log('this.repoReadme', this.repoReadme);
+
+    let repoCommits = await window.fetch(`https://api.github.com/repos/${this.input}/stats/participation`)
+    repoCommits = await repoCommits.json()
+    this.repoCommits = repoCommits;
+    console.log('this.repoCommits', this.repoCommits);
 
     this.$emit('project-found', {
       project: this.project,
       projectContributorsStats: this.projectContributorsStats,
-      hasDocs: 0, // TODO need to verify first
+      hasDocs: this.repoReadme? this.repoReadme.size > 0 ? 1 : 0 : 0,
       hasLicense: repoDetailsResult.data.license && repoDetailsResult.data.license.name ? 1 : 0,
       busFactor: this.busFactor,
-      activity: 0,
+      activity: this.commitScore,
     })
   }
 }
