@@ -86,7 +86,6 @@ export default class ProjectSearch extends Vue {
     if (this.repoCommits) {
       // all: is an array with 52 weeks of commits counts
       let {all, owner} = this.repoCommits
-      console.log('all, owner', all, owner);
       let sumOfZeroCommitWeeks = all.reduce((total, week) => {
         week === 0 ? total += 1 : 0
         return total
@@ -100,22 +99,17 @@ export default class ProjectSearch extends Vue {
 
   public async search () {
     const repo = this.gh.getRepo(this.input)
-    console.log('repo', repo);
     const repoDetailsResult = await repo.getDetails()
     this.project = repoDetailsResult.data
-    console.log('this.project', this.project);
     const repoContributorStatsResult = await repo.getContributorStats()
     this.projectContributorsStats = repoContributorStatsResult.data
-    console.log('this.projectContributorsStats', this.projectContributorsStats);
 
     const repoReadme = await repo.getReadme()
     this.repoReadme = repoReadme.data;
-    console.log('this.repoReadme', this.repoReadme);
 
     let repoCommits = await window.fetch(`https://api.github.com/repos/${this.input}/stats/participation`)
     repoCommits = await repoCommits.json()
     this.repoCommits = repoCommits;
-    console.log('this.repoCommits', this.repoCommits);
 
     this.$emit('project-found', {
       project: this.project,

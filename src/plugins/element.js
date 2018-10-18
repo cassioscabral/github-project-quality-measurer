@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import {
   Button,
-  Input
+  Input,
+  InputNumber
 } from 'element-ui'
 
 import lang from 'element-ui/lib/locale/lang/pt-br'
@@ -11,3 +12,4 @@ locale.use(lang)
 
 Vue.use(Button)
 Vue.use(Input)
+Vue.use(InputNumber)
